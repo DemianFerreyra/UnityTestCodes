@@ -5,23 +5,37 @@ using UnityEngine;
 public class RoadDrawer : MonoBehaviour
 {
     public GameObject test;
-    public Transform pos1, pos2, pivot;
+    public Transform pos1, pos2, pivot, parent, pillarsParent;
     private int numPoints;
     private Vector3[] positions = new Vector3[100];
+    private Vector3[] Last = new Vector3[2];
 
     // Start is called before the first frame update
     void Start(){
         numPoints = Mathf.CeilToInt(Vector3.Distance(pos1.position, pos2.position) / 2);
+        Last[0] = pos1.position;
+        Last[1] = pos2.position;
         CalcBezierCurve();
     }
 
     // Update is called once per frame
     void Update(){
+        PositionChange(Last[0], pos1, 0);
+        PositionChange(Last[1], pos2, 1);
     }
 
+    private void PositionChange(Vector3 Lastpos, Transform Pos, int num){
+         if(Lastpos != Pos.position){
+            Clean();
+            numPoints = Mathf.CeilToInt(Vector3.Distance(pos1.position, pos2.position) / 2);
+            CalcBezierCurve();
+            Last[num] = Pos.position;
+        }
+    }
     private void CalcBezierCurve(){
         for (int i = 0; i < numPoints + 1; i++){
             float t = i / (float) numPoints;
+            Debug.Log(t);
             positions[i] = CalculateQuadraticPoint(t, pos1.position, pivot.position, pos2.position);
         }
         DrawBezierCurve();
@@ -35,15 +49,15 @@ public class RoadDrawer : MonoBehaviour
                 if (Physics.Raycast(pos, transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity)){
                     if (Vector3.Distance(hit.point, pos) >= 6){
                         if (pillarSpace == 0){
-                            Instantiate(test, hit.point, Quaternion.identity);
-                            pillarSpace = 3;
+                            Instantiate(test, hit.point, Quaternion.identity, pillarsParent);
+                            pillarSpace = 5;
                         }
                         else{
                             pillarSpace -= 1;
                         }
                     }
                 }
-                Instantiate(test, pos, Quaternion.identity, this.transform);
+                Instantiate(test, pos, Quaternion.identity, parent);
             }
         }
     }
@@ -56,5 +70,13 @@ public class RoadDrawer : MonoBehaviour
         pointPos += 2 * u * t * p2;
         pointPos += tt * p3;
         return pointPos;
+    }
+    private void Clean(){
+      foreach (Transform child in parent) {
+        GameObject.Destroy(child.gameObject);
+      }
+      foreach (Transform child in pillarsParent) {
+        GameObject.Destroy(child.gameObject);
+      }
     }
 }
