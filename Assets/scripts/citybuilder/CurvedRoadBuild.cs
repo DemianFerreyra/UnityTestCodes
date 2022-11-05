@@ -6,8 +6,9 @@ public class CurvedRoadBuild : MonoBehaviour
 {
     public Transform parent;
     public GameObject test;
-    public Vector3[] positions = new Vector3[100];
-
+    private List<Vector3> leftPositions = new List<Vector3>();
+    private List<Vector3> rightPositions = new List<Vector3>();
+    public int resolution = 2;
     public void getPoint(Vector3 pos)
     {
         Instantiate(test, pos, Quaternion.identity, parent);
@@ -15,11 +16,13 @@ public class CurvedRoadBuild : MonoBehaviour
 
     public void CalcBezierCurve(Vector3 pos1, Vector3 pos2, Vector3 pivot)
     {
-        int numPoints = Mathf.CeilToInt(Vector3.Distance(pos1, pos2) / 2);
+        int numPoints = Mathf.CeilToInt(Vector3.Distance(pos1, pos2) / resolution);
+        Debug.Log(numPoints);
         for (int i = 0; i < numPoints + 1; i++)
         {
             float t = i / (float)numPoints;
-            positions[i] = CalculateQuadraticPoint(t, pos1, pivot, pos2);
+            rightPositions.Add(CalculateQuadraticPoint(t, pos1 + new Vector3(2,0,0), pivot + new Vector3(2,0,-2), pos2 + new Vector3(0,0,-2)));
+            leftPositions.Add(CalculateQuadraticPoint(t, pos1 + new Vector3(-2,0,0), pivot + new Vector3(-2,0,2), pos2 + new Vector3(0,0,2)));
         }
         DrawBezierCurve();
     }
@@ -39,7 +42,30 @@ public class CurvedRoadBuild : MonoBehaviour
     {
         RaycastHit hit;
         int pillarSpace = 0;
-        foreach (var pos in positions)
+        foreach (var pos in leftPositions)
+        {
+            if (pos != new Vector3(0, 0, 0))
+            {
+                if (Physics.Raycast(pos, transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity))
+                {
+                    if (Vector3.Distance(hit.point, pos) >= 6)
+                    {
+                        if (pillarSpace == 0)
+                        {
+                            Instantiate(test, hit.point, Quaternion.identity, this.transform);
+                            pillarSpace = 5;
+                        }
+                        else
+                        {
+                            pillarSpace -= 1;
+                        }
+                    }
+                }
+                Instantiate(test, pos, Quaternion.identity, parent);
+                rayCheck(pos);
+            }
+        }
+        foreach (var pos in rightPositions)
         {
             if (pos != new Vector3(0, 0, 0))
             {
