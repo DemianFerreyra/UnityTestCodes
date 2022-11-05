@@ -5,9 +5,9 @@ using UnityEngine;
 public class RoadDrawer : MonoBehaviour
 {
     public GameObject test;
-    public Transform pos1, pos2, pivot, parent, pillarsParent;
+    public Transform pos1, pos2, pivot, parent, pillarsParent, prueba;
     private int numPoints;
-    private Vector3[] positions = new Vector3[100];
+    public Vector3[] positions = new Vector3[100];
     private Vector3[] Last = new Vector3[2];
 
     // Start is called before the first frame update
@@ -16,12 +16,26 @@ public class RoadDrawer : MonoBehaviour
         Last[0] = pos1.position;
         Last[1] = pos2.position;
         CalcBezierCurve();
+        prueba.position = pos1.position;
     }
 
     // Update is called once per frame
     void Update(){
         PositionChange(Last[0], pos1, 0);
         PositionChange(Last[1], pos2, 1);
+        foreach (var pos in positions)
+        {
+             if (pos != new Vector3(0, 0, 0)){
+             rayCheck(pos);
+             }
+        }
+    }
+    private void rayCheck(Vector3 goTo){
+       prueba.position = Vector3.MoveTowards(prueba.position, goTo, 1000f * Time.deltaTime);
+       RaycastHit hit;
+       if (Physics.Raycast(prueba.position, transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity) && hit.transform.tag == "Road"){
+         Debug.Log("Pisamos camino");
+       }
     }
 
     private void PositionChange(Vector3 Lastpos, Transform Pos, int num){
@@ -35,7 +49,6 @@ public class RoadDrawer : MonoBehaviour
     private void CalcBezierCurve(){
         for (int i = 0; i < numPoints + 1; i++){
             float t = i / (float) numPoints;
-            Debug.Log(t);
             positions[i] = CalculateQuadraticPoint(t, pos1.position, pivot.position, pos2.position);
         }
         DrawBezierCurve();
