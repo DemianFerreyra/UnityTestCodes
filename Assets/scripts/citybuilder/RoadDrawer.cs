@@ -26,17 +26,14 @@ public class RoadDrawer : MonoBehaviour
         pos1.position = curvedBuilder.rightPositions[i];
         pos2.position = curvedBuilder.leftPositions[i];
         pos1.LookAt(pos2);
-        
-        //Trasladamos la pos1 1 metro, asi lo dejamos siempre centrado, y ademas, lo desplazamos la mitad del ancho de la calle, asi lo dejamos del lado exterior
+        //Trasladamos la pos1 1 metro, asi lo dejamos siempre centrado, y ademas, luego lo desplazamos la mitad del ancho de la calle, asi lo dejamos del lado exterior
         pos1.Translate(Vector3.forward * 1);
-        Debug.Log(RoadWidth);
         pos1.Translate(Vector3.back * (RoadWidth / 2));
-        //luego:
         foreach (var patternPoint in pattern)
         {
             pos1.Translate(Vector3.forward * patternPoint.z);
             pos1.Translate(Vector3.up * patternPoint.x);
-            Instantiate(test, pos1.position, pos1.rotation, this.transform);
+            vertices.Add(pos1.position);
             pos1.Translate(Vector3.back * patternPoint.z);
             pos1.Translate(Vector3.down * patternPoint.x);
         }
