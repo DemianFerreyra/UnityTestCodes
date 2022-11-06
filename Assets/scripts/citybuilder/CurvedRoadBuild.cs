@@ -6,8 +6,8 @@ public class CurvedRoadBuild : MonoBehaviour
 {
     public Transform parent;
     public GameObject test;
-    private List<Vector3> leftPositions = new List<Vector3>();
-    private List<Vector3> rightPositions = new List<Vector3>();
+    public List<Vector3> leftPositions = new List<Vector3>();
+    public List<Vector3> rightPositions = new List<Vector3>();
     public int resolution = 2;
     public void getPoint(Vector3 pos)
     {
@@ -21,8 +21,8 @@ public class CurvedRoadBuild : MonoBehaviour
         for (int i = 0; i < numPoints + 1; i++)
         {
             float t = i / (float)numPoints;
-            rightPositions.Add(CalculateQuadraticPoint(t, pos1 + new Vector3(2,0,0), pivot + new Vector3(2,0,-2), pos2 + new Vector3(0,0,-2)));
-            leftPositions.Add(CalculateQuadraticPoint(t, pos1 + new Vector3(-2,0,0), pivot + new Vector3(-2,0,2), pos2 + new Vector3(0,0,2)));
+            rightPositions.Add(CalculateQuadraticPoint(t, pos1 + new Vector3(1,0,0), pivot + new Vector3(1,0,-1), pos2 + new Vector3(0,0,-1)));
+            leftPositions.Add(CalculateQuadraticPoint(t, pos1 + new Vector3(-1,0,0), pivot + new Vector3(-1,0,1), pos2 + new Vector3(0,0,1)));
         }
         DrawBezierCurve();
     }
@@ -61,7 +61,7 @@ public class CurvedRoadBuild : MonoBehaviour
                         }
                     }
                 }
-                Instantiate(test, pos, Quaternion.identity, parent);
+                // Instantiate(test, pos, Quaternion.identity, parent);
                 rayCheck(pos);
             }
         }
@@ -84,7 +84,7 @@ public class CurvedRoadBuild : MonoBehaviour
                         }
                     }
                 }
-                Instantiate(test, pos, Quaternion.identity, parent);
+                // Instantiate(test, pos, Quaternion.identity, parent);
                 rayCheck(pos);
             }
         }

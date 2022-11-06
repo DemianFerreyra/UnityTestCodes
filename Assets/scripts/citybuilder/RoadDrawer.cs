@@ -4,92 +4,49 @@ using UnityEngine;
 
 public class RoadDrawer : MonoBehaviour
 {
+    public List<Vector3> pattern = new List<Vector3>();
+    public CurvedRoadBuild curvedBuilder;
+    public MeshFilter mf;
+    public List<Vector3> vertices = new List<Vector3>();
+    public Transform pos1, pos2;
     public GameObject test;
-    public Transform pos1, pos2, pivot, parent, pillarsParent, prueba;
-    private int numPoints;
-    public Vector3[] positions = new Vector3[100];
-    private Vector3[] Last = new Vector3[2];
-
-    // Start is called before the first frame update
-    void Start(){
-        numPoints = Mathf.CeilToInt(Vector3.Distance(pos1.position, pos2.position) / 2);
-        Last[0] = pos1.position;
-        Last[1] = pos2.position;
-        CalcBezierCurve();
-        prueba.position = pos1.position;
-    }
 
     // Update is called once per frame
     void Update(){
-        PositionChange(Last[0], pos1, 0);
-        PositionChange(Last[1], pos2, 1);
-        foreach (var pos in positions)
-        {
-             if (pos != new Vector3(0, 0, 0)){
-             rayCheck(pos);
-             }
-        }
-    }
-    private void rayCheck(Vector3 goTo){
-       prueba.position = Vector3.MoveTowards(prueba.position, goTo, 1000f * Time.deltaTime);
-       RaycastHit hit;
-       if (Physics.Raycast(prueba.position, transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity) && hit.transform.tag == "Road"){
-         Debug.Log("Pisamos camino");
-       }
-    }
-
-    private void PositionChange(Vector3 Lastpos, Transform Pos, int num){
-         if(Lastpos != Pos.position){
-            Clean();
-            numPoints = Mathf.CeilToInt(Vector3.Distance(pos1.position, pos2.position) / 2);
-            CalcBezierCurve();
-            Last[num] = Pos.position;
-        }
-    }
-    private void CalcBezierCurve(){
-        for (int i = 0; i < numPoints + 1; i++){
-            float t = i / (float) numPoints;
-            positions[i] = CalculateQuadraticPoint(t, pos1.position, pivot.position, pos2.position);
-        }
-        DrawBezierCurve();
-    }
-
-    private void DrawBezierCurve(){
-        RaycastHit hit;
-        int pillarSpace = 0;
-        foreach (var pos in positions){
-            if (pos != new Vector3(0, 0, 0)){
-                if (Physics.Raycast(pos, transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity)){
-                    if (Vector3.Distance(hit.point, pos) >= 6){
-                        if (pillarSpace == 0){
-                            Instantiate(test, hit.point, Quaternion.identity, pillarsParent);
-                            pillarSpace = 5;
-                        }
-                        else{
-                            pillarSpace -= 1;
-                        }
-                    }
-                }
-                Instantiate(test, pos, Quaternion.identity, parent);
-            }
-        }
-    }
-
-    private Vector3 CalculateQuadraticPoint(float t, Vector3 p1, Vector3 p2, Vector3 p3){
-        float u = 1 - t;
-        float tt = t * t;
-        float uu = u * u;
-        Vector3 pointPos = uu * p1;
-        pointPos += 2 * u * t * p2;
-        pointPos += tt * p3;
-        return pointPos;
-    }
-    private void Clean(){
-      foreach (Transform child in parent) {
-        GameObject.Destroy(child.gameObject);
+      if(Input.GetKeyDown("b")){
+        DrawRoad();
       }
-      foreach (Transform child in pillarsParent) {
-        GameObject.Destroy(child.gameObject);
+    }
+    private void DrawRoad(){
+      pos1 = Instantiate(test, this.transform.position, Quaternion.identity, this.transform).transform;
+      pos2 = Instantiate(test, this.transform.position, Quaternion.identity, this.transform).transform;
+      for (int i = 0; i < curvedBuilder.leftPositions.Count; i++)
+      {
+        pos1.position = curvedBuilder.rightPositions[i];
+        pos2.position = curvedBuilder.leftPositions[i];
+        pos1.LookAt(pos2);
+        
+        Instantiate(test, pos1.position, pos1.rotation, this.transform);
+        Transform p2 = Instantiate(test, pos1.position, pos1.rotation, this.transform).transform;
+        p2.Translate(Vector3.forward * 3);
+        Transform p3 = Instantiate(test, pos1.position, pos1.rotation, this.transform).transform;
+        p3.Translate(Vector3.forward * 5);
+        // p2.Translate(3,0,0, Space.World);
+        // float angle = Vector3.Angle(curvedBuilder.leftPositions[i], curvedBuilder.rightPositions[i]);
+        // for (int x = 0; x < pattern.Count; x++)
+        // {
+        //     //por cada punto del patron, vamos a: 
+        //     //2) rotarlo segun "angle"
+        //     // vertices.Add(Quaternion.AngleAxis(angle, Vector3.up) * curvedBuilder.leftPositions[i] + nPoint);
+        //     if(x == 0){
+        //       Instantiate(test,curvedBuilder.rightPositions[i], Quaternion.identity, this.transform);
+        //     }else{
+        //       Debug.Log("desplazamiento en Z de:" + pattern[x].z * Mathf.Cos(angle));
+        //       Debug.Log("desplazamiento en X de:" + pattern[x].z * Mathf.Sin(angle));
+        //       Instantiate(test,curvedBuilder.rightPositions[i], Quaternion.identity, this.transform);
+        //     }
+        // }
       }
+
     }
 }
