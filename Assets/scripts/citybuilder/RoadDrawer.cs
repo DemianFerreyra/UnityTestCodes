@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class RoadDrawer : MonoBehaviour
 {
@@ -14,10 +15,10 @@ public class RoadDrawer : MonoBehaviour
     // Update is called once per frame
     void Update(){
       if(Input.GetKeyDown("b")){
-        DrawRoad();
+        DrawRoad(pattern.Max(vector => vector.z));
       }
     }
-    private void DrawRoad(){
+    private void DrawRoad(float RoadWidth){
       pos1 = Instantiate(test, this.transform.position, Quaternion.identity, this.transform).transform;
       pos2 = Instantiate(test, this.transform.position, Quaternion.identity, this.transform).transform;
       for (int i = 0; i < curvedBuilder.leftPositions.Count; i++)
@@ -26,27 +27,19 @@ public class RoadDrawer : MonoBehaviour
         pos2.position = curvedBuilder.leftPositions[i];
         pos1.LookAt(pos2);
         
-        Instantiate(test, pos1.position, pos1.rotation, this.transform);
-        Transform p2 = Instantiate(test, pos1.position, pos1.rotation, this.transform).transform;
-        p2.Translate(Vector3.forward * 3);
-        Transform p3 = Instantiate(test, pos1.position, pos1.rotation, this.transform).transform;
-        p3.Translate(Vector3.forward * 5);
-        // p2.Translate(3,0,0, Space.World);
-        // float angle = Vector3.Angle(curvedBuilder.leftPositions[i], curvedBuilder.rightPositions[i]);
-        // for (int x = 0; x < pattern.Count; x++)
-        // {
-        //     //por cada punto del patron, vamos a: 
-        //     //2) rotarlo segun "angle"
-        //     // vertices.Add(Quaternion.AngleAxis(angle, Vector3.up) * curvedBuilder.leftPositions[i] + nPoint);
-        //     if(x == 0){
-        //       Instantiate(test,curvedBuilder.rightPositions[i], Quaternion.identity, this.transform);
-        //     }else{
-        //       Debug.Log("desplazamiento en Z de:" + pattern[x].z * Mathf.Cos(angle));
-        //       Debug.Log("desplazamiento en X de:" + pattern[x].z * Mathf.Sin(angle));
-        //       Instantiate(test,curvedBuilder.rightPositions[i], Quaternion.identity, this.transform);
-        //     }
-        // }
+        //Trasladamos la pos1 1 metro, asi lo dejamos siempre centrado, y ademas, lo desplazamos la mitad del ancho de la calle, asi lo dejamos del lado exterior
+        pos1.Translate(Vector3.forward * 1);
+        Debug.Log(RoadWidth);
+        pos1.Translate(Vector3.back * (RoadWidth / 2));
+        //luego:
+        foreach (var patternPoint in pattern)
+        {
+            pos1.Translate(Vector3.forward * patternPoint.z);
+            pos1.Translate(Vector3.up * patternPoint.x);
+            Instantiate(test, pos1.position, pos1.rotation, this.transform);
+            pos1.Translate(Vector3.back * patternPoint.z);
+            pos1.Translate(Vector3.down * patternPoint.x);
+        }
       }
-
     }
 }
