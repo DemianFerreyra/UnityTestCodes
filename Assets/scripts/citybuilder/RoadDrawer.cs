@@ -12,7 +12,6 @@ public class RoadDrawer : MonoBehaviour
     public Mesh mesh;
 
     public List<Vector3> vertices = new List<Vector3>();
-
     public List<int> tris = new List<int>();
 
     public Transform pos1,pos2;
@@ -21,12 +20,13 @@ public class RoadDrawer : MonoBehaviour
     {
         if (Input.GetKeyDown("b"))
         {
-            CalculateRoad(pattern.Max(vector => vector.z));
+            CalculateRoad();
         }
     }
 
-    private void CalculateRoad(float RoadWidth)
+    public void CalculateRoad()
     {
+        float RoadWidth = pattern.Max(vector => vector.z);
         pos1 =
             Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),
             this.transform.position,
@@ -38,22 +38,17 @@ public class RoadDrawer : MonoBehaviour
             Quaternion.identity,
             this.transform).transform;
 
-        for (int i = 0; i < curvedBuilder.leftPositions.Count; i++)
+        for (int i = 0; i < curvedBuilder.positions.Count - 1; i++)
         {
-            pos1.position = curvedBuilder.rightPositions[i];
-            pos2.position = curvedBuilder.leftPositions[i];
-            pos1.LookAt (pos2);
-
-            //Trasladamos la pos1 1 metro, asi lo dejamos siempre centrado, y ademas, luego lo desplazamos la mitad del ancho de la calle, asi lo dejamos del lado exterior
-            pos1.Translate(Vector3.forward * 1);
-            pos1.Translate(Vector3.back * (RoadWidth / 2));
+            pos1.position = curvedBuilder.positions[i];
+            pos2.position = curvedBuilder.positions[i + 1];
+            pos1.LookAt(pos2);
             foreach (var patternPoint in pattern)
             {
-                pos1.Translate(Vector3.forward * patternPoint.z);
+                pos1.Translate(Vector3.left * (patternPoint.z - RoadWidth / 2));
                 pos1.Translate(Vector3.up * patternPoint.x);
                 vertices.Add(pos1.position);
-                Debug.Log(pos1.position);
-                pos1.Translate(Vector3.back * patternPoint.z);
+                pos1.Translate(Vector3.right * (patternPoint.z - RoadWidth / 2));
                 pos1.Translate(Vector3.down * patternPoint.x);
             }
         }
@@ -61,26 +56,31 @@ public class RoadDrawer : MonoBehaviour
         //Ahora que tenemos todos los puntos, necesitamos empezar con los triangulos
         for (int f = 0; f < vertices.Count - pattern.Count - 1; f++)
         {
+            //right top triangle
+            tris.Add(f);
+            tris.Add(f + 1);
+            tris.Add(f + pattern.Count + 1);
+
             //left bottom triangle
             tris.Add(f);
+            tris.Add(f + pattern.Count + 1);
             tris.Add(f + pattern.Count);
-            tris.Add(f + pattern.Count + 1);
-
-            //right top triangle
-            tris.Add (f);
-            tris.Add(f + pattern.Count + 1);
-            tris.Add(f + 1);
         }
+        curvedBuilder.positions.Clear();
         DrawRoad();
     }
-
     private void DrawRoad()
     {
+        GameObject actualRoad = new GameObject();
         mesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = mesh;
+        actualRoad.AddComponent<MeshFilter>();
+        actualRoad.AddComponent<MeshRenderer>();
+        actualRoad.transform.GetComponent<MeshFilter>().mesh = mesh;
         mesh.Clear();
         mesh.vertices = vertices.ToArray();
         mesh.triangles = tris.ToArray();
         mesh.RecalculateNormals();
+        vertices.Clear();
+        tris.Clear();
     }
 }
