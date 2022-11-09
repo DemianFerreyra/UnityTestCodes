@@ -70,12 +70,12 @@ public class RoadDrawer : MonoBehaviour
 
 
         //Y por ultimo los UV
-        for (int i = 0; i < curvedBuilder.positions.Count - 1; i++)
+        for (int x = 0; x < vertices.Count / 4; x++)
         {
-            uv.Add(new Vector2(0, 1));
-            uv.Add(new Vector2(0, 0));
             uv.Add(new Vector2(1, 0));
-            uv.Add(new Vector2(1, 1));
+            uv.Add(new Vector2(1, 0.3f));
+            uv.Add(new Vector2(0, 0.3f) );
+            uv.Add(new Vector2(0, 0));
         }
         curvedBuilder.positions.Clear();
         DrawRoad();
@@ -92,6 +92,8 @@ public class RoadDrawer : MonoBehaviour
         mesh.triangles = tris.ToArray();
         mesh.uv = uv.ToArray();
         mesh.RecalculateNormals();
+        Debug.Log("uvs =" + uv.Count);
+        Debug.Log("vertices =" + vertices.Count);
         uv.Clear();
         vertices.Clear();
         tris.Clear();
