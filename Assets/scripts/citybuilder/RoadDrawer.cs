@@ -13,6 +13,7 @@ public class RoadDrawer : MonoBehaviour
 
     public List<Vector3> vertices = new List<Vector3>();
     public List<int> tris = new List<int>();
+    public List<Vector2> uv = new List<Vector2>();
 
     public Transform pos1,pos2;
 
@@ -66,6 +67,16 @@ public class RoadDrawer : MonoBehaviour
             tris.Add(f + pattern.Count + 1);
             tris.Add(f + pattern.Count);
         }
+
+
+        //Y por ultimo los UV
+        for (int i = 0; i < curvedBuilder.positions.Count - 1; i++)
+        {
+            uv.Add(new Vector2(0, 1));
+            uv.Add(new Vector2(0, 0));
+            uv.Add(new Vector2(1, 0));
+            uv.Add(new Vector2(1, 1));
+        }
         curvedBuilder.positions.Clear();
         DrawRoad();
     }
@@ -79,7 +90,9 @@ public class RoadDrawer : MonoBehaviour
         mesh.Clear();
         mesh.vertices = vertices.ToArray();
         mesh.triangles = tris.ToArray();
+        mesh.uv = uv.ToArray();
         mesh.RecalculateNormals();
+        uv.Clear();
         vertices.Clear();
         tris.Clear();
     }
