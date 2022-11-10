@@ -6,24 +6,17 @@ using UnityEngine;
 public class RoadDrawer : MonoBehaviour
 {
     public List<Vector3> pattern = new List<Vector3>();
+    public int[] roadpath;
+    public int[] walkpath;
 
     public CurvedRoadBuild curvedBuilder;
-
+    public List<Vector3> vertices = new List<Vector3>();
+    public List<int> roadTris = new List<int>();
+    public List<int> walkTris = new List<int>();
+    public List<Vector2> uv = new List<Vector2>();
     public Mesh mesh;
 
-    public List<Vector3> vertices = new List<Vector3>();
-    public List<int> tris = new List<int>();
-    public List<Vector2> uv = new List<Vector2>();
-
     public Transform pos1,pos2;
-
-    void Update()
-    {
-        if (Input.GetKeyDown("b"))
-        {
-            CalculateRoad();
-        }
-    }
 
     public void CalculateRoad()
     {
@@ -53,23 +46,37 @@ public class RoadDrawer : MonoBehaviour
                 pos1.Translate(Vector3.down * patternPoint.x);
             }
         }
-
-        //Ahora que tenemos todos los puntos, necesitamos empezar con los triangulos
+        int iteratorHelper = 0;
         for (int f = 0; f < vertices.Count - pattern.Count - 1; f++)
         {
+            if(iteratorHelper > pattern.Count - 1){
+              iteratorHelper = 0;
+            }
+            if(roadpath.Contains(iteratorHelper)){
             //right top triangle
-            tris.Add(f);
-            tris.Add(f + 1);
-            tris.Add(f + pattern.Count + 1);
+            roadTris.Add(f);
+            roadTris.Add(f + 1);
+            roadTris.Add(f + pattern.Count + 1);
 
             //left bottom triangle
-            tris.Add(f);
-            tris.Add(f + pattern.Count + 1);
-            tris.Add(f + pattern.Count);
+            roadTris.Add(f);
+            roadTris.Add(f + pattern.Count + 1);
+            roadTris.Add(f + pattern.Count);
+            }else{
+            //right top triangle
+            walkTris.Add(f);
+            walkTris.Add(f + 1);
+            walkTris.Add(f + pattern.Count + 1);
+
+            //left bottom triangle
+            walkTris.Add(f);
+            walkTris.Add(f + pattern.Count + 1);
+            walkTris.Add(f + pattern.Count);
+            }      
+            iteratorHelper++;  
         }
 
 
-        //Y por ultimo los UV
         for (int x = 0; x < vertices.Count / 4; x++)
         {
             uv.Add(new Vector2(1, 0));
@@ -89,13 +96,14 @@ public class RoadDrawer : MonoBehaviour
         actualRoad.transform.GetComponent<MeshFilter>().mesh = mesh;
         mesh.Clear();
         mesh.vertices = vertices.ToArray();
-        mesh.triangles = tris.ToArray();
+        mesh.subMeshCount = 2;
+        mesh.SetTriangles (walkTris.ToArray(), 0);
+        mesh.SetTriangles (roadTris.ToArray(), 1);
         mesh.uv = uv.ToArray();
         mesh.RecalculateNormals();
-        Debug.Log("uvs =" + uv.Count);
-        Debug.Log("vertices =" + vertices.Count);
-        uv.Clear();
         vertices.Clear();
-        tris.Clear();
+        roadTris.Clear();
+        walkTris.Clear();
+        uv.Clear();
     }
 }
