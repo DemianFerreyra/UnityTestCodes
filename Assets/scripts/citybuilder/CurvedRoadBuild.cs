@@ -10,7 +10,7 @@ public class CurvedRoadBuild : MonoBehaviour
     public float resolution = 2;
     public void getPoint(Vector3 pos)
     {
-        Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube), pos, Quaternion.identity, parent);
+       //de momento esto no hace nada
     }
 
     public void CalcBezierCurve(Vector3 pos1, Vector3 pos2, Vector3 pivot)
@@ -49,7 +49,6 @@ public class CurvedRoadBuild : MonoBehaviour
                     {
                         if (pillarSpace == 0)
                         {
-                            Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube), hit.point, Quaternion.identity, this.transform);
                             pillarSpace = 5;
                         }
                         else

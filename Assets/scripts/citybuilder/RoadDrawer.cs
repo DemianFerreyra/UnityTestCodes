@@ -15,23 +15,11 @@ public class RoadDrawer : MonoBehaviour
     public List<int> walkTris = new List<int>();
     public List<Vector2> uv = new List<Vector2>();
     public Mesh mesh;
-
     public Transform pos1,pos2;
 
     public void CalculateRoad()
     {
         float RoadWidth = pattern.Max(vector => vector.z);
-        pos1 =
-            Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),
-            this.transform.position,
-            Quaternion.identity,
-            this.transform).transform;
-        pos2 =
-            Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube),
-            this.transform.position,
-            Quaternion.identity,
-            this.transform).transform;
-
         for (int i = 0; i < curvedBuilder.positions.Count - 1; i++)
         {
             pos1.position = curvedBuilder.positions[i];
@@ -90,13 +78,14 @@ public class RoadDrawer : MonoBehaviour
     private void DrawRoad()
     {
         GameObject actualRoad = new GameObject();
-        mesh = new Mesh();
+        mesh = new Mesh();  
         actualRoad.AddComponent<MeshFilter>();
-        actualRoad.AddComponent<MeshRenderer>();
+        MeshRenderer mr = actualRoad.AddComponent<MeshRenderer>();
         actualRoad.transform.GetComponent<MeshFilter>().mesh = mesh;
         mesh.Clear();
         mesh.vertices = vertices.ToArray();
         mesh.subMeshCount = 2;
+        mr.materials = new Material[2];
         mesh.SetTriangles (walkTris.ToArray(), 0);
         mesh.SetTriangles (roadTris.ToArray(), 1);
         mesh.uv = uv.ToArray();
