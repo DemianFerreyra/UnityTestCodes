@@ -8,10 +8,6 @@ public class CurvedRoadBuild : MonoBehaviour
     public List<Vector3> positions = new List<Vector3>();
     public RoadDrawer rd;
     public float resolution = 2;
-    public void getPoint(Vector3 pos)
-    {
-       //de momento esto no hace nada
-    }
 
     public void CalcBezierCurve(Vector3 pos1, Vector3 pos2, Vector3 pivot)
     {
