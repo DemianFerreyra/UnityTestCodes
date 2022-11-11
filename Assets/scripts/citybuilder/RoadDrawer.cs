@@ -73,14 +73,12 @@ public class RoadDrawer : MonoBehaviour
             uv.Add(new Vector2(0, 0));
         }
         curvedBuilder.positions.Clear();
-        DrawRoad();
     }
-    private void DrawRoad()
+    public void DrawRoad(Transform actualRoad)
     {
-        GameObject actualRoad = new GameObject();
         mesh = new Mesh();  
-        actualRoad.AddComponent<MeshFilter>();
-        MeshRenderer mr = actualRoad.AddComponent<MeshRenderer>();
+        actualRoad.gameObject.AddComponent<MeshFilter>();
+        MeshRenderer mr = actualRoad.gameObject.AddComponent<MeshRenderer>();
         actualRoad.transform.GetComponent<MeshFilter>().mesh = mesh;
         mesh.Clear();
         mesh.vertices = vertices.ToArray();

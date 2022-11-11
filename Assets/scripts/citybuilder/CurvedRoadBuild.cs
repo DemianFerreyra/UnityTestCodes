@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class CurvedRoadBuild : MonoBehaviour
 {
-    public Transform parent;
     public List<Vector3> positions = new List<Vector3>();
     public RoadDrawer rd;
     public float resolution = 2;
 
-    public void CalcBezierCurve(Vector3 pos1, Vector3 pos2, Vector3 pivot)
+    public void CalcBezierCurve(Vector3 pos1, Vector3 pos2, Vector3 pivot, Transform road)
     {
         int numPoints = Mathf.CeilToInt(Vector3.Distance(pos1, pos2) / resolution);
         for (int i = 0; i < numPoints + 1; i++)
@@ -17,7 +16,7 @@ public class CurvedRoadBuild : MonoBehaviour
             float t = i / (float)numPoints;
             positions.Add(CalculateQuadraticPoint(t, pos1, pivot, pos2));
         }
-        DrawBezierCurve();
+        DrawBezierCurve(road);
     }
 
     private Vector3 CalculateQuadraticPoint(float t, Vector3 p1, Vector3 p2, Vector3 p3)
@@ -31,7 +30,7 @@ public class CurvedRoadBuild : MonoBehaviour
         return pointPos;
     }
 
-    private void DrawBezierCurve()
+    private void DrawBezierCurve(Transform road)
     {
         RaycastHit hit;
         int pillarSpace = 0;
@@ -57,18 +56,16 @@ public class CurvedRoadBuild : MonoBehaviour
             }
         }
         rd.CalculateRoad();
+        rd.DrawRoad(road);
     }
 
-    private void rayCheck(Vector3 goTo)
+    private void rayCheck(Vector3 pos)
     {
         RaycastHit hit;
-        if (Physics.Raycast(goTo, transform.TransformDirection(Vector3.down), out hit, 600f) && hit.transform.tag == "Road")
-        {
-            Debug.Log("Pisamos camino");
-        }
-        if (Physics.SphereCast(goTo, 10f, transform.forward, out hit, 10) && hit.transform.tag == "Road")
-        {
+        if (Physics.Raycast(pos + new Vector3(0,1,0), transform.TransformDirection(Vector3.down), out hit, 7f) && hit.transform.tag == "Road"){      
             Debug.Log("colisionamos con camino");
+        }else if (Physics.Raycast(pos + new Vector3(0,1,0), transform.TransformDirection(Vector3.down), out hit, 7f) && hit.transform.tag == "Terrain"){
+            Debug.Log("colisionamos con terreno");
         }
     }
 }
