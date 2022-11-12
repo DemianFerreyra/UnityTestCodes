@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a69fcf97b9ac4c24eaf85846035c759d, type: 3}
   m_Name: Edificiocomercial1
   m_EditorClassIdentifier: 
-  objPath: /scripts/citybuilder/Assetmanager/Edificiocomercial1/edi1.obj
+  objPath: /assets/building/edi1.obj
   loadedObject: {fileID: 0}
